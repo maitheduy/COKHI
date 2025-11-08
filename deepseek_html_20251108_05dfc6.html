@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Đạo Hàm Qua Cơ Học - Bộ Vi Sai Ô Tô</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root {
+    --primary: #3a86ff;
+    --secondary: #8338ec;
+    --accent: #ff006e;
+    --dark: #1a202c;
+    --light: #f7fafc;
+    --success: #38b2ac;
+    --warning: #fbbf24;
+    --card-bg: #ffffff;
+    --card-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    --gradient: linear-gradient(135deg, #3a86ff 0%, #8338ec 100%);
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: var(--dark);
+    line-height: 1.6;
+  }
+  
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  
+  .subtitle {
+    font-size: 1.2rem;
+    color: #4a5568;
+    margin-bottom: 15px;
+  }
+  
+  .intro {
+    max-width: 800px;
+    margin: 0 auto 20px;
+    text-align: center;
+    color: #4a5568;
+  }
+  
+  .row {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    margin-bottom: 24px;
+  }
+  
+  .panel {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease;
+  }
+  
+  .panel:hover {
+    transform: translateY(-5px);
+  }
+  
+  .visualization {
+    flex: 1;
+  }
+  
+  canvas {
+    background: linear-gradient(180deg, #e6eef8, #fff);
+    border-radius: 12px;
+    display: block;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .controls {
+    width: 380px;
+  }
+  
+  .formulas {
+    flex: 1;
+  }
+  
+  .control-group {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--dark);
+  }
+  
+  input[type="range"] {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: #e2e8f0;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--primary);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  
+  .value-display {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: 14px;
+    color: #4a5568;
+  }
+  
+  .live-values {
+    background: var(--dark);
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 20px;
+    font-family: 'Courier New', monospace;
+  }
+  
+  .live-values h3 {
+    margin-bottom: 10px;
+    color: var(--warning);
+  }
+  
+  .formula-container {
+    background: #1a202c;
+    color: #bfe3ff;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 16px;
+    overflow: auto;
+    line-height: 1.8;
+  }
+  
+  .math-formula {
+    margin: 15px 0;
+    padding: 15px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+  }
+  
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 15px;
+    font-size: 14px;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+  }
+  
+  .footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px;
+    color: #4a5568;
+    font-size: 14px;
+  }
+  
+  .highlight {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  
+  @media (max-width: 1100px) {
+    .row {
+      flex-direction: column;
+    }
+    
+    .controls {
+      width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Đạo Hàm Qua Cơ Học: Bộ Vi Sai Ô Tô</h1>
+    <p class="subtitle">Minh họa trực quan khái niệm đạo hàm thông qua nguyên lý hoạt động của bộ vi sai</p>
+    <p class="intro">Thay đổi các thông số bên dưới để quan sát mối quan hệ giữa đạo hàm và chuyển động của bánh xe!</p>
+  </header>
+
+  <div class="row">
+    <div class="panel visualization">
+      <canvas id="scene" width="800" height="450"></canvas>
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-color" style="background: #3a86ff;"></div>
+          <span>Bánh xe ngoài (ω<sub>outer</sub>)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #ff006e;"></div>
+          <span>Bánh xe trong (ω<sub>inner</sub>)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #38b2ac;"></div>
+          <span>Trục truyền động (ω<sub>drive</sub>)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #ef4444;"></div>
+          <span>Tâm quay tức thời (IC)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel controls">
+      <div class="control-group">
+        <label for="steer">Góc lái (degrees)</label>
+        <input id="steer" type="range" min="-35" max="35" value="0">
+        <div class="value-display">
+          <span>-35°</span>
+          <span id="steerVal">0°</span>
+          <span>35°</span>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label for="speed">Vận tốc xe (m/s)</label>
+        <input id="speed" type="range" min="0" max="20" step="0.1" value="5">
+        <div class="value-display">
+          <span>0 m/s</span>
+          <span id="speedVal">5.0 m/s</span>
+          <span>20 m/s</span>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label for="tire">Bán kính bánh xe (m)</label>
+        <input id="tire" type="range" min="0.15" max="0.5" step="0.01" value="0.32">
+        <div class="value-display">
+          <span>0.15 m</span>
+          <span id="tireVal">0.32 m</span>
+          <span>0.5 m</span>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label for="wheelbase">Chiều dài cơ sở (m)</label>
+        <input id="wheelbase" type="range" min="1.6" max="3.2" step="0.01" value="2.6">
+        <div class="value-display">
+          <span>1.6 m</span>
+          <span id="wbVal">2.6 m</span>
+          <span>3.2 m</span>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label for="track">Khoảng cách bánh xe (m)</label>
+        <input id="track" type="range" min="1.0" max="2.0" step="0.01" value="1.5">
+        <div class="value-display">
+          <span>1.0 m</span>
+          <span id="trackVal">1.5 m</span>
+          <span>2.0 m</span>
+        </div>
+      </div>
+
+      <div class="live-values">
+        <h3>Giá trị thời gian thực:</h3>
+        <div id="liveVals">ω_inner = ... , ω_outer = ... , ω_drive = ...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="panel formulas">
+      <h2>Công thức Toán học</h2>
+      <div class="formula-container">
+        <div class="math-formula">
+          <p><strong>Vận tốc góc của khung xe:</strong></p>
+          <p>\[ \omega_{\text{chassis}} = \frac{v}{R} \]</p>
+          <p>Trong đó \(v\) là vận tốc tuyến tính, \(R\) là bán kính quay vòng</p>
+        </div>
+        
+        <div class="math-formula">
+          <p><strong>Bán kính quỹ đạo bánh xe:</strong></p>
+          <p>\[ R_{\text{inner}} = R - \frac{\text{track}}{2} \]</p>
+          <p>\[ R_{\text{outer}} = R + \frac{\text{track}}{2} \]</p>
+        </div>
+        
+        <div class="math-formula">
+          <p><strong>Vận tốc tuyến tính bánh xe:</strong></p>
+          <p>\[ v_{\text{inner}} = \omega_{\text{chassis}} \cdot R_{\text{inner}} \]</p>
+          <p>\[ v_{\text{outer}} = \omega_{\text{chassis}} \cdot R_{\text{outer}} \]</p>
+        </div>
+        
+        <div class="math-formula">
+          <p><strong>Vận tốc góc bánh xe (đạo hàm góc quay):</strong></p>
+          <p>\[ \omega_{\text{inner}} = \frac{v_{\text{inner}}}{r_{\text{tire}}} \]</p>
+          <p>\[ \omega_{\text{outer}} = \frac{v_{\text{outer}}}{r_{\text{tire}}} \]</p>
+        </div>
+        
+        <div class="math-formula">
+          <p><strong>Điều kiện bộ vi sai mở:</strong></p>
+          <p>\[ \frac{\omega_{\text{inner}} + \omega_{\text{outer}}}{2} = \frac{v}{r_{\text{tire}}} = \omega_{\text{drive}} \]</p>
+          <p>Đây chính là <span class="highlight">phương trình vi phân</span> được giải bằng cơ cấu cơ khí!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Minh họa được thiết kế để giảng dạy khái niệm đạo hàm cho học sinh cấp 3</p>
+    <p>Đạo hàm không chỉ là công thức toán học mà còn là giải pháp cho các vấn đề kỹ thuật thực tế!</p>
+  </div>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('scene');
+  const ctx = canvas.getContext('2d');
+
+  // Controls
+  const steer = document.getElementById('steer');
+  const speed = document.getElementById('speed');
+  const tire = document.getElementById('tire');
+  const wheelbase = document.getElementById('wheelbase');
+  const track = document.getElementById('track');
+
+  const steerVal = document.getElementById('steerVal');
+  const speedVal = document.getElementById('speedVal');
+  const tireVal = document.getElementById('tireVal');
+  const wbVal = document.getElementById('wbVal');
+  const trackVal = document.getElementById('trackVal');
+  const liveVals = document.getElementById('liveVals');
+
+  function updateLabels(){
+    steerVal.textContent = steer.value + '°';
+    speedVal.textContent = parseFloat(speed.value).toFixed(1) + ' m/s';
+    tireVal.textContent = parseFloat(tire.value).toFixed(2) + ' m';
+    wbVal.textContent = parseFloat(wheelbase.value).toFixed(2) + ' m';
+    trackVal.textContent = parseFloat(track.value).toFixed(2) + ' m';
+  }
+  [steer,speed,tire,wheelbase,track].forEach(el => el.addEventListener('input', updateLabels));
+  updateLabels();
+
+  // Scene coordinates
+  const W = canvas.width, H = canvas.height;
+  const carCx = W/2, carCy = H/2 + 20;
+
+  // visual scale: meters -> pixels
+  const scale = 80; // 1 m = 80 px (visual)
+  let lastTime = performance.now();
+  let wheelRotationInner = 0;
+  let wheelRotationOuter = 0;
+  let frontSteer = 0;
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+
+    // read parameters
+    const steerDeg = parseFloat(steer.value) * Math.PI/180;
+    const v = parseFloat(speed.value); // m/s
+    const r_tire = parseFloat(tire.value);
+    const wb = parseFloat(wheelbase.value);
+    const tr = parseFloat(track.value);
+
+    // Compute turning radius of midline (simple ackermann-like)
+    // R = wheelbase / tan(steerAngle) ; if steer angle = 0 -> straight (infinite R)
+    let R;
+    if (Math.abs(steerDeg) < 1e-4) {
+      R = 1e9; // effectively straight
+    } else {
+      R = Math.abs(wb / Math.tan(steerDeg)); // midline turning radius
+    }
+    // Sign for left vs right
+    const turnSign = steerDeg > 0 ? 1 : (steerDeg < 0 ? -1 : 0);
+
+    // chassis angular speed
+    const omega_chassis = (R > 1e8) ? 0 : v / R; // rad/s
+
+    // path radii of rear wheels relative to IC:
+    const R_inner = R - (tr/2);
+    const R_outer = R + (tr/2);
+
+    // linear speeds
+    const v_inner = omega_chassis * R_inner;
+    const v_outer = omega_chassis * R_outer;
+
+    // wheel angular speeds (rad/s) (wheel rim radius r_tire)
+    const omega_inner = (r_tire > 0) ? v_inner / r_tire : 0;
+    const omega_outer = (r_tire > 0) ? v_outer / r_tire : 0;
+
+    // drive (center) omega:
+    const omega_drive = v / r_tire;
+
+    // time step for wheel visual rotation
+    const now = performance.now();
+    const dt = Math.min(0.05, (now - lastTime)/1000);
+    lastTime = now;
+
+    // update wheel rotation angles (visual)
+    // choose sign so rotation matches forward motion (negative for clockwise)
+    wheelRotationInner -= omega_inner * dt;
+    wheelRotationOuter -= omega_outer * dt;
+
+    // draw car midline
+    ctx.save();
+    ctx.translate(carCx, carCy);
+
+    // Rotate the whole car slightly to show turning curvature (for visualization)
+    const chassisAngle = (R>1e8) ? 0 : (turnSign * Math.atan2(wb/2, R)); // visual small tilt
+    ctx.rotate(chassisAngle);
+
+    // draw midline
+    ctx.strokeStyle = '#4a5568'; 
+    ctx.lineWidth = 3;
+    ctx.setLineDash([5, 3]);
+    ctx.beginPath();
+    ctx.moveTo(-1.6*scale, 0);
+    ctx.lineTo(1.6*scale, 0);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // draw front axle (steering) - small arrow
+    const frontX = wb/2 * scale;
+    ctx.save();
+    ctx.translate(frontX, 0);
+    ctx.rotate(steerDeg);
+    // front wheel (visual)
+    drawWheel(ctx, 0, 0, 0.32*scale, 12, false);
+    ctx.restore();
+
+    // draw rear axle and two drive wheels
+    const rearX = -wb/2 * scale;
+    // axle bar
+    ctx.strokeStyle = '#64748b';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(rearX, - (tr/2)*scale - 6);
+    ctx.lineTo(rearX, (tr/2)*scale + 6);
+    ctx.stroke();
+
+    // inner vs outer depending on turnSign (if turning left (positive), left wheel is outer)
+    // For drawing choose left = negative y
+    const leftY = -tr/2*scale;
+    const rightY = tr/2*scale;
+
+    // determine which side is inner/outer for sign
+    let innerY, outerY, innerLabel, outerLabel;
+    if (turnSign > 0) { // steering positive -> turning left -> left wheel is outer
+      outerY = leftY; innerY = rightY;
+      innerLabel = 'inner'; outerLabel = 'outer';
+    } else if (turnSign < 0) { // turning right
+      outerY = rightY; innerY = leftY;
+      innerLabel = 'inner'; outerLabel = 'outer';
+    } else {
+      // straight: neither inner nor outer; but keep left as outer for labeling
+      outerY = leftY; innerY = rightY;
+      innerLabel = 'inner'; outerLabel = 'outer';
+    }
+
+    // draw outer wheel (visual rotation)
+    ctx.save();
+    ctx.translate(rearX, outerY);
+    drawWheelRotating(ctx, 0, 0, 0.32*scale, wheelRotationOuter, outerLabel, '#3a86ff');
+    ctx.restore();
+
+    // draw inner wheel
+    ctx.save();
+    ctx.translate(rearX, innerY);
+    drawWheelRotating(ctx, 0, 0, 0.32*scale, wheelRotationInner, innerLabel, '#ff006e');
+    ctx.restore();
+
+    // draw axle center label
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 14px system-ui, -apple-system, "Segoe UI", Roboto';
+    ctx.fillText('Trục truyền động', rearX - 25, - (tr/2)*scale - 18);
+
+    ctx.restore();
+
+    // Draw HUD text
+    ctx.fillStyle = '#1a202c';
+    ctx.font = 'bold 14px system-ui, -apple-system, "Segoe UI", Roboto';
+    ctx.fillText(`Góc lái: ${ (steerDeg*180/Math.PI).toFixed(1) }°   Vận tốc: ${ v.toFixed(2) } m/s`, 12, 25);
+    ctx.fillText(`Bán kính bánh xe: ${ r_tire.toFixed(3) } m`, 12, 50);
+
+    // Draw numeric live values on right
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#ff006e';
+    ctx.fillText(`ω_inner = ${omega_inner.toFixed(3)} rad/s`, W - 12, 25);
+    ctx.fillStyle = '#3a86ff';
+    ctx.fillText(`ω_outer = ${omega_outer.toFixed(3)} rad/s`, W - 12, 50);
+    ctx.fillStyle = '#38b2ac';
+    ctx.fillText(`ω_drive = ${omega_drive.toFixed(3)} rad/s`, W - 12, 75);
+    ctx.textAlign = 'left';
+
+    // update live text block
+    liveVals.innerHTML = `
+      <span style="color:#ff006e">ω<sub>inner</sub> = ${omega_inner.toFixed(3)} rad/s</span> , 
+      <span style="color:#3a86ff">ω<sub>outer</sub> = ${omega_outer.toFixed(3)} rad/s</span> , 
+      <span style="color:#38b2ac">ω<sub>drive</sub> = ${omega_drive.toFixed(3)} rad/s</span>
+    `;
+
+    // draw optional turning center (IC) visual when turning
+    if (Math.abs(steerDeg) > 1e-3 && R < 1e8) {
+      const Rpx = R * scale;
+      // draw arc center to show turning center (to the left or right of car)
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.3)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      const centerX = carCx + (turnSign>0 ? -Rpx : Rpx);
+      ctx.arc(centerX, carCy, Rpx, 0, Math.PI*2);
+      ctx.stroke();
+
+      // small dot at IC
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(centerX, carCy, 6, 0, Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle = '#1a202c';
+      ctx.font = 'bold 14px system-ui';
+      ctx.fillText(`Tâm quay (R=${R.toFixed(2)} m)`, centerX + 8*(turnSign>0?1:-1), carCy - 10);
+    }
+  }
+
+  function drawWheel(ctx, x, y, r, spokes=12, showLabel=true){
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.fillStyle = '#1a202c';
+    ctx.beginPath();
+    ctx.arc(0,0,r,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawWheelRotating(ctx, x, y, r, angle, label, color){
+    // outer rubber
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.rotate(angle);
+    // tire
+    ctx.fillStyle = color;
+    roundedCircle(ctx, 0, 0, r, 8);
+    // rim
+    ctx.fillStyle = '#94a3b8';
+    ctx.beginPath();
+    ctx.arc(0,0,r*0.55,0,Math.PI*2);
+    ctx.fill();
+    // spokes lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.lineWidth = 2;
+    for(let i=0;i<8;i++){
+      const a = i * Math.PI*2/8;
+      const x1 = Math.cos(a) * r*0.15;
+      const y1 = Math.sin(a) * r*0.15;
+      const x2 = Math.cos(a) * r*0.45;
+      const y2 = Math.sin(a) * r*0.45;
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    }
+    // label
+    ctx.rotate(-angle);
+    ctx.fillStyle = '#1a202c';
+    ctx.font = 'bold 12px system-ui, -apple-system, "Segoe UI", Roboto';
+    ctx.fillText(label, -r*0.3, r + 15);
+    ctx.restore();
+  }
+
+  function roundedCircle(ctx, cx, cy, r, corners) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI*2);
+    ctx.fill();
+    // subtle inner ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, r*0.92, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  function loop(){
+    draw();
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+</script>
+
+</body>
+</html>
